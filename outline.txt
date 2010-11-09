@@ -1,4 +1,5 @@
-Users : Name, ID, ROLE {Student, Prof, Admin}, ManyToMany(EnrolledClass) classes taken
+User (use django.contrib.auth.User). Make student, professor, admin groups.
+
 Course : Dept, Number, Name, ID, Description, ForeignKey(Course) Prereq
 Class: ForeignKey(Semester), DaysMet, StartTime, EndTime, ForeignKey(User) Professor, ClassSize, ManyToMany(User) students, ForeignKey(Course) course
 Semester: Name, Start Date, End Date, Reg Start Date, Reg End Date
