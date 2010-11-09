@@ -29,6 +29,10 @@ class Class(models.Model) :
 	#will ignore the date and just use time
 	end_time_met = models.DateTimeField()
 	max_class_size = models.IntegerField()
-	students = models.ManyToManyField(User)
 	course = models.ForeignKey(Course)
+	professor = models.ForeignKey(User)
+class EnrolledClass(models.Model) :
+	student = models.ForeignKey(User)
+	class_enrolled = models.ForeignKey(Class)
+	grade = models.SmallIntegerField()
 
