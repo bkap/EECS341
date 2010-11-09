@@ -8,6 +8,7 @@ class Semester(models.Model) :
 	end_date = models.DateField()
 	reg_start_date = models.DateField()
 	reg_end_date = models.DateField()
+
 class Course(models.Model) :
 	number = models.SmallIntegerField()
 	name = models.CharField(max_length=20)
@@ -25,6 +26,7 @@ class Class(models.Model) :
 	max_class_size = models.IntegerField()
 	course = models.ForeignKey(Course)
 	professor = models.ForeignKey(User)
+
 class EnrolledClass(models.Model) :
 	student = models.ForeignKey(User)
 	class_enrolled = models.ForeignKey(Class)

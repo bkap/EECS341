@@ -1,2 +1,4 @@
 from django.conf.urls.defaults import *
-urlpatterns = patterns('',)
+from views import login
+urlpatterns = patterns('',
+	(r'login.html',login))
