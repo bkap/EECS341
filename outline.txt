@@ -1,0 +1,27 @@
+Users : Name, ID, ROLE {Student, Prof, Admin}, ManyToMany(EnrolledClass) classes taken
+Course : Dept, Number, Name, ID, Description, ForeignKey(Course) Prereq
+Class: ForeignKey(Semester), DaysMet, StartTime, EndTime, ForeignKey(User) Professor, ClassSize, ManyToMany(User) students, ForeignKey(Course) course
+Semester: Name, Start Date, End Date, Reg Start Date, Reg End Date
+Schedule : ForeignKey(User), ForeignKey(Semester), ManyToMany(EnrolledClass)
+EnrolledClass : ForeignKey(User) ForeignKey(Class), grade
+
+
+3 roles
+Admin : see all grades, add classes, add courses, add users, add students to classes
+
+Professor : see grades for their classes, add students to their classes, add grades to their current classes
+
+Student : see their grades, see all classes, add themselves to a class if within reg dates and class is not full and doesn't conflict with schedule and have prereqs
+
+
+Different views :
+Home page -> Professors and students see current classes
+Login page
+Class Info page -> all can see, students have "add" button to enroll, profs and admins have add button to add a student (prompt for student)
+Class search page -> all can see
+Student search page -> admin can see all students, professors see students in classes
+View grades page (student) -> see grades for specific semester
+View grades page (admin and prof) -> select student (admin) or class (prof), see grades. Can set grades. 
+Add class page (admin only) -> form
+Add user page (admin only) -> form
+
