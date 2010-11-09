@@ -6,11 +6,11 @@ from django.conf.urls.defaults import *
 
 urlpatterns = patterns('',
     # Example:
-    # (r'^eecs341/', include('eecs341.foo.urls')),
+     (r'^scheduler/', include('eecs341.scheduler.urls')),
 
     # Uncomment the admin/doc line below to enable admin documentation:
-    # (r'^admin/doc/', include('django.contrib.admindocs.urls')),
+     (r'^admin/doc/', include('django.contrib.admindocs.urls')),
 
     # Uncomment the next line to enable the admin:
-    # (r'^admin/', include(admin.site.urls)),
+     (r'^admin/', include(admin.site.urls)),
 )

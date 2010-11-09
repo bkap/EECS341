@@ -1,0 +1,10 @@
+This is a project for EECS 341 (databases) at CWRU. It's a course scheduling
+system.
+
+Setting up the project:
+You need Python 2.6 or 2.7 and a database backend.
+It's currently configured to use Postgresql with the psycopg2 connector. I made
+a database called eecs341, made a user wih name eecs341 and password eecs341.
+If you want to use something else (say, SQLite which is easier to use but only
+lets one person connect at a time), change the appropriate values in
+settings.py
