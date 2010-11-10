@@ -1,5 +1,6 @@
 from django.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group, Permission
+
 # Create your models here.
 
 class Semester(models.Model) :
@@ -17,6 +18,8 @@ class Course(models.Model) :
 	prereq = models.ForeignKey('self')
 	
 class Class(models.Model) :
+	class Meta:
+		permissions = (("can_teach","is a professor who can teach the course"),)
 	semester = models.ForeignKey(Semester)
 	days_met = models.CommaSeparatedIntegerField(max_length=5)
 	#let's use 0 = Monday, 4 = Friday
@@ -28,7 +31,11 @@ class Class(models.Model) :
 	professor = models.ForeignKey(User)
 
 class EnrolledClass(models.Model) :
+	class Meta :
+		permissions = (("can_enroll","is a student who can enroll"),
+						("can_set_grades","is allowed to change grades"))
 	student = models.ForeignKey(User)
 	class_enrolled = models.ForeignKey(Class)
 	grade = models.SmallIntegerField()
+
 
