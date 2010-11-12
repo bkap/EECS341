@@ -3,8 +3,9 @@ from django.http import HttpResponse
 from django.shortcuts import render_to_response
 from django.core.context_processors import csrf
 from django.contrib.auth.models import User
+from django.contrib.auth import authenticate, login
 # Create your views here.
-def login(request) :
+def login_page(request) :
 	if request.method == 'GET' :
 		c = {}
 		c.update(csrf(request))
@@ -14,8 +15,15 @@ def login(request) :
 		request.POST['uname'])
 def hello(request) :
 	if request.method == 'POST' :
-		u = User.objects.get(username__exact=request.POST['uname'])
-		if u.check_password(request.POST['pword']) :
-			return render_to_response('welcome.html',{'user':u})
+		user = authenticate(username=request.POST['uname'], password=request.POST['pword'])
+		if user is not None and user.is_active :
+			login(request, user)
+			return render_to_response('welcome.html',{'user':user})
 		else :
 			return HttpResponse("Login unsuccesful. Press back and try again")
+	else :
+		
+		if request.user.is_authenticated() :
+			return render_to_response('welcome.html',{'user':request.user})
+		else :
+			return HttpResponse("Please Login")	
