@@ -1,0 +1,26 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>Untitled Document</title>
+</head>
+
+<body>
+{%for class in courses %}
+<table>
+<tr> <td colspan="4"> <b>{{class.course.name}}</b></td> </tr>
+<tr> <td> {{class.course.dept}} {{class.course.number}} </td>
+		<td>{{class.professor.lastname}}, {{class.professor.firstname}} </td>
+        <td> {%if "0" in class.days_met %} M {%endif%}
+        	 {% if "1" in class.days_met %} T {%endif %}
+             {%if "2" in class.days_met %} W {%endif %}
+             {% if "3" in class.days_met %} H {% endif %}
+             {% if "4" in class.days_met %} F {% endif %}
+         </td>
+        <td> {{class.start_time.time().hour}}:{{class.start_time.time().minute}} - {{class.end_time.time().hour}} : {{class.end_time.time().minute}} </td>
+ </tr>
+</table>
+<br />
+{%endfor%}
+</body>
+</html>

@@ -1,0 +1,27 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>Search Classes</title>
+</head>
+
+<body>
+<h1> Search for Classes </h1>
+<br />
+<form action="search.html" method="get" name="searchclasses">
+<label> Semester: </label><select name="semester" >{%for sem in semesters %} <option name="{{sem.name}}">{{sem.name}}</option> {% endfor %} </select> <br />
+ <label>Dept: </label><input name="dept" type="text" size="4" maxlength="4" />
+ <br />
+ <label> Class Number: </label><select name="ratio" size="1" >
+ <option value="eq">Equal To </option>
+ <option value="gt">Greater than </option>
+ <option value="lt"> Less than </option>
+ </select><input name="coursenum" type="text" size="4" maxlength="4" />
+ <br />
+ <label>Professor: </label><input name="professor" type="text" size="10" />
+ <br />
+ <input name="search" type="submit" value="Search" />
+</form>
+
+</body>
+</html>
