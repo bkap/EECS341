@@ -10,13 +10,19 @@ class Semester(models.Model) :
 	reg_start_date = models.DateField()
 	reg_end_date = models.DateField()
 
+class Room(models.Model) :
+	buildingName = models.CharField(max_length=30)
+	roomNum = models.IntegerField()
+	max_capacity = models.IntegerField()
+	class Meta:
+		unique_together = (("buildingName","roomNum"),)
 class Course(models.Model) :
 	number = models.SmallIntegerField()
 	name = models.CharField(max_length=20)
 	dept = models.CharField(max_length=4)
 	id = models.IntegerField(primary_key=True)
 	prereq = models.ForeignKey('self')
-	
+	description = models.TextField()	
 class Class(models.Model) :
 	class Meta:
 		permissions = (("can_teach","is a professor who can teach the course"),)
@@ -29,7 +35,7 @@ class Class(models.Model) :
 	max_class_size = models.IntegerField()
 	course = models.ForeignKey(Course)
 	professor = models.ForeignKey(User)
-
+	room = models.ForeignKey(Room)
 class EnrolledClass(models.Model) :
 	class Meta :
 		permissions = (("can_enroll","is a student who can enroll"),
@@ -38,4 +44,7 @@ class EnrolledClass(models.Model) :
 	class_enrolled = models.ForeignKey(Class)
 	grade = models.SmallIntegerField()
 
-
+class Schedule(models.Model) :
+	user = models.ForeignKey(User)
+	semester = models.ForeignKey(Semester)
+	classes_enrolled = models.ManyToManyField(Class)
