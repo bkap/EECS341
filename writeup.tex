@@ -31,23 +31,48 @@ about the class as well as viewing who is enrolled in each class.
 \subsection{Tables}
 User(\underline{username: varchar(30)},firstname: varchar, lastname: varchar,
 password: Pass	word, usertype: Enum(Student,Professor,Admin)
-
+\\
 Semester(\underline{name:
 varchar},start\_date:date,end\_date:date,reg\_start\_date:date,reg\_end\_date:date)
+\\
 Course(\underline{courseID	: Integer},name:varchar,dept:varchar(4), number:
-SmallInt, prereq: Integer (ForeignKey to Course))
+SmallInt, prereq: Integer (ForeignKey to Course), description: text)
+\\
 Class(\underline{classNumber: Integer}, semester: varchar (ForeignKey to
 Semester), days\_met : varchar(5), start\_time\_met : Time, end\_time\_met:
 Time, course: Integer (ForeignKey to Course), professor: varchar(30)
-(ForeignKey to User), max\_class\_size: Integer)
+(ForeignKey to User), max\_class\_size: Integer, buildingName: varchar,
+roomNum: Integer)
+\\
 EnrolledClass(\underline{student: varchar(30) (Foreign Key to User),
 class\_enrolled : Integer (Foreign Key to Class)}, grade: SmallInt)
-
+\\
+Schedule(\underline{user: varchar(30) (ForeignKey to User), semester: varchar
+(ForeignKey to Semester), class\_enrolled: Integer(ForeignKey to Class)}) <-
+Join table, to get the list of classes the user is enrolled in for a specific
+semester
+\\
+CoursesTaken(\underline{student: varchar(30) (ForeignKey to User), courseID:
+Integer}) <-- a list of the clases the student has taken\\
+Room(\underline{buildingName: varchar, roomNumber: Integer}, max\_capacity:
+Integer)
 \subsection{Constraints}
 	* on create Class, Class.professor.usertype = Professor. Will happen pretty
-	frequently- every time classes are created for the new semester
+	frequently- every time classes are created for the new semester\\
 	* on create EnrolledClass, EnrolledClass.student.usertype = Student. Will
-	happen frequently- for each class each student goes to enroll in.
-
+	happen frequently- for each class each student goes to enroll in.\\
+	* on create Schedule, ensure Schedule.class\_enrolled.semester =
+	Schedule.semester\\
+	* On create EnrolledClass, if class\_enrolled.course.prereq is not NULL, ensure
+	that there exists (SELECT * FROM CoursesTaken T where T.user =
+	EnrolledClass.user and T.courseID =
+	class\_enrolled.course.prereq.courseID\\
+	* On create Class, if buildingName and roomNumber are not NULL, ensure that
+	there does not exist a Class in the same room at the same time in the same
+	semester, and ensure that Class.max\_class\_size <= Room.max\_capacity
+\subsection{Triggers}
+	* On create EnrolledClass, if user already has class scheduled for that
+	time (check Schedule), cancel the create. Otherwise, add Schedule (user, class.semester,
+	EnrolledClass). 
 \end{document}
 
