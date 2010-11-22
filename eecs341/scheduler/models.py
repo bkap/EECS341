@@ -29,9 +29,9 @@ class Class(models.Model) :
 	semester = models.ForeignKey(Semester)
 	days_met = models.CommaSeparatedIntegerField(max_length=5)
 	#let's use 0 = Monday, 4 = Friday
-	start_time_met = models.DateTimeField() 
+	start_time_met = models.TimeField() 
 	#will ignore the date and just use time
-	end_time_met = models.DateTimeField()
+	end_time_met = models.TimeField()
 	max_class_size = models.IntegerField()
 	course = models.ForeignKey(Course)
 	professor = models.ForeignKey(User)
