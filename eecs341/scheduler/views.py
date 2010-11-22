@@ -31,18 +31,21 @@ def hello(request) :
 def search(request) :
 	return render_to_response('search_form.html',{})
 def searchresults(request) :
-	dept = request.GET['dept'] or None
-	sem_name = request.GET['semester'] or None
-	course_num = request.GET['coursenum'] or None
-	professor = request.GET['professor'] or None
+	queries = {}
+	dept = request.GET['dept']
+	if dept :
+		queries['course__dept'] = dept
+	sem_name = request.GET['semester']
+	if sem_name :
+			queries['semester__name'] = sem_name
+	course_num = request.GET['coursenum']
+	professor = request.GET['professor']
+	if professor:
+		queries['professor'] = professor
 	order = request.GET['ratio']
-	semester = Semester.objects.get(name=sem_name)
-	if semester is None :
-		return HttpResponse("Error: unable to find semester")
-	coursenum__gt=int(course_num) if order == 'gt' else None
-	coursenum__lt = int(course_num) if order=='lt' else None
-	coursenum = int(course_num) if order=="eq" else None
-	
-	#TODO: figrue out how to do this query efficiently
+	if order == 'eq' :
+		queries['course__number'] = coursenum
+	else :
+		queries['course__number__%s' % order] = coursenum
 	return render_to_response("search.html",{user:request.user,
-	courses:Class.objects.all()})
+	courses:Class.objects.filter(**queries)})

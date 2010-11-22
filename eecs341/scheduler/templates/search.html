@@ -17,7 +17,7 @@
              {% if "3" in class.days_met %} H {% endif %}
              {% if "4" in class.days_met %} F {% endif %}
          </td>
-        <td> {{class.start_time.time().hour}}:{{class.start_time.time().minute}} - {{class.end_time.time().hour}} : {{class.end_time.time().minute}} </td>
+        <td> {{class.start_time.hour}}:{{class.start_time.minute}} - {{class.end_time.hour}} : {{class.end_time.minute}} </td>
  </tr>
 </table>
 <br />
