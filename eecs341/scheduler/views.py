@@ -45,8 +45,8 @@ def searchresults(request) :
 		queries['professor'] = professor
 	order = request.GET['ratio']
 	if order == 'eq' :
-		queries['course__number'] = coursenum
+		queries['course__number'] = course_num
 	else :
-		queries['course__number__%s' % order] = coursenum
-	return render_to_response("search.html",{user:request.user,
-	courses:Class.objects.filter(**queries)})
+		queries['course__number__%s' % order] = course_num
+	return render_to_response("search.html",{'user':request.user,
+	'courses':Class.objects.filter(**queries)})
