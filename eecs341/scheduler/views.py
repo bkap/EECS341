@@ -4,6 +4,7 @@ from django.shortcuts import render_to_response
 from django.core.context_processors import csrf
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login
+from scheduler.models import *
 # Create your views here.
 def login_page(request) :
 	if request.method == 'GET' :
@@ -28,8 +29,8 @@ def hello(request) :
 		else :
 			return HttpResponse("Please Login")	
 
-def search(request) :
-	return render_to_response('search_form.html',{})
+def search_form(request) :
+	return render_to_response('searchform.html',{'semesters':Semester.objects.all()})
 def searchresults(request) :
 	queries = {}
 	dept = request.GET['dept']
