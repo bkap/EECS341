@@ -1,0 +1,78 @@
+\documentclass[11pt,oneside,a4paper]{article}
+\usepackage{textcomp}
+\usepackage{setspace}
+\usepackage{graphicx}
+\title{EECS 341 Database Project: Class Scheduler}
+\begin{document}
+\maketitle
+\section{Introduction}
+This project is a course scheduling program for students at a University
+(similar to the Student Information System that Case uses, but one that doesn't
+take as long to execute queries).
+\section{Application Requirements Specifications}
+The application has three classes of users: Students, Professors, and
+Administrators. Each has a set of actions that they will be able to perform.
+\subsection{Administrators}
+Administrators are able to add new users, define new semesters, create new
+courses and classes, view and set the grades of any student, and enroll students in
+classes.
+\subsection{Professors}
+Professors are capable of being listed as teaching classes. They are able to
+view and set the grades of the students for the classes taught by the
+professor. They are capable of enrolling students in classes that they teach.
+\subsection{Students}
+Students are capable of enrolling in classes, provided the class is not at its
+maximum capacity, and viewing their own grades.
+\subsection{All users}
+All users can search the database of classes. They can see basic information
+about the class as well as viewing who is enrolled in each class.
+
+\section{Database Requirements Specification}
+\subsection{Tables}
+User(\underline{username: varchar(30)},firstname: varchar, lastname: varchar,
+password: Pass	word, usertype: Enum(Student,Professor,Admin)
+\\
+Semester(\underline{name:
+varchar},start\_date:date,end\_date:date,reg\_start\_date:date,reg\_end\_date:date)
+\\
+Course(\underline{courseID	: Integer},name:varchar,dept:varchar(4), number:
+SmallInt, prereq: Integer (ForeignKey to Course), description: text)
+\\
+Class(\underline{classNumber: Integer}, semester: varchar (ForeignKey to
+Semester), days\_met : varchar(5), start\_time\_met : Time, end\_time\_met:
+Time, course: Integer (ForeignKey to Course), professor: varchar(30)
+(ForeignKey to User), max\_class\_size: Integer, buildingName: varchar,
+roomNum: Integer)
+\\
+EnrolledClass(\underline{student: varchar(30) (Foreign Key to User),
+class\_enrolled : Integer (Foreign Key to Class)}, grade: SmallInt)
+\\
+Schedule(\underline{user: varchar(30) (ForeignKey to User), semester: varchar
+(ForeignKey to Semester), class\_enrolled: Integer(ForeignKey to Class)}) <-
+Join table, to get the list of classes the user is enrolled in for a specific
+semester
+\\
+CoursesTaken(\underline{student: varchar(30) (ForeignKey to User), courseID:
+Integer}) <-- a list of the clases the student has taken\\
+Room(\underline{buildingName: varchar, roomNumber: Integer}, max\_capacity:
+Integer)
+\subsection{Constraints}
+	* on create Class, Class.professor.usertype = Professor. Will happen pretty
+	frequently- every time classes are created for the new semester\\
+	* on create EnrolledClass, EnrolledClass.student.usertype = Student. Will
+	happen frequently- for each class each student goes to enroll in.\\
+	* on create Schedule, ensure Schedule.class\_enrolled.semester =
+	Schedule.semester\\
+	* On create EnrolledClass, if class\_enrolled.course.prereq is not NULL, ensure
+	that there exists (SELECT * FROM CoursesTaken T where T.user =
+	EnrolledClass.user and T.courseID =
+	class\_enrolled.course.prereq.courseID\\
+	* On create Class, if buildingName and roomNumber are not NULL, ensure that
+	there does not exist a Class in the same room at the same time in the same
+	semester, and ensure that Class.max\_class\_size <= Room.max\_capacity
+\subsection{Triggers}
+	* On create EnrolledClass, if user already has class scheduled for that
+	time (check Schedule), cancel the create. Otherwise, add Schedule (user, class.semester,
+	EnrolledClass). 
+\end{document}
+
