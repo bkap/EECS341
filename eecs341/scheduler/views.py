@@ -60,6 +60,6 @@ def getgrades(request) :
 			classes = sched.classes_enrolled.all()
 		else :
 			classes = []
-		return render_to_response('viewgrades.html',{'user':request.user, 'classes':classes})
+		return render_to_response('viewgrades.html',{'user':request.user, 'classes':classes,'semester':sem})
 	semesters = [schedule.semester for schedule in Schedule.objects.filter(user=request.user)]
 	return render_to_response('select_semester_grades.html',{'user':request.user,'semesters':semesters})
