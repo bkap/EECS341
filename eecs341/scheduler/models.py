@@ -59,8 +59,13 @@ class EnrolledClass(models.Model) :
 	student = models.ForeignKey(User)
 	class_enrolled = models.ForeignKey(Class)
 	grade = models.CharField(max_length=2, choices=GRADE_CHOICES, blank=True,null=True)
-
+	def __str__(self) :
+		if self.grade :
+			return "%s enrolled in %s with a grade of %s" % (self.student.username, self.class_enrolled, self.grade)
+		return "%s enrolled in %s" % (self.student.username, self.class_enrolled)
 class Schedule(models.Model) :
 	user = models.ForeignKey(User)
 	semester = models.ForeignKey(Semester)
 	classes_enrolled = models.ManyToManyField(EnrolledClass)
+	def __str__(self) :
+		return "Schedule for %s in %s" % (self.user, self.semester)
