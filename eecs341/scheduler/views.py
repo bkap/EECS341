@@ -2,7 +2,7 @@ import models
 from django.http import HttpResponse
 from django.shortcuts import render_to_response
 from django.core.context_processors import csrf
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User,Group
 from django.contrib.auth import authenticate, login
 from scheduler.models import *
 # Create your views here.
@@ -52,7 +52,15 @@ def searchresults(request) :
 	'courses':Class.objects.filter(**queries)})
 
 def getgrades(request) :
-	if not request.user.is_authenticated :
-		return redirect_to('login.html')
+	if not request.user.is_authenticated() or not request.user.has_perm('can_enroll'):
+		return HttpResponse('This page is currently only available for students')
+	if request.GET.get('sem',None) != None :
+		sem = Semester.objects.get(name=request.GET['sem'])
+		sched = Schedule.objects.get(user=request.user, semester=sem)
+		if sched :
+			classes = sched.classes_enrolled
+		else :
+			classes = []
+		return render_to_response('viewgrades.html',{'user':request.user, 'classes':classes})
 	semesters = [schedule.semester for schedule in Schedule.objects.filter(user=request.user)]
 	return render_to_response('select_semester_grades.html',{'user':request.user,'semesters':semesters})

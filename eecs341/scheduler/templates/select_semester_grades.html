@@ -9,7 +9,7 @@
 	<h2> Grades for {{user.firstname}} </h2> <br />
 	Please Select a Semester:
     <form action="grades.html" method="get">
-    <select name="semester" size="1">
+    <select name="sem" size="1">
     {%for semester in semesters %}
     <option id="{{semester.name}}"> {{semester.name}} </option>
     {% endfor %}

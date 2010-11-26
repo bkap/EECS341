@@ -58,9 +58,9 @@ class EnrolledClass(models.Model) :
 						("can_set_grades","is allowed to change grades"))
 	student = models.ForeignKey(User)
 	class_enrolled = models.ForeignKey(Class)
-	grade = models.CharField(max_length=2, choices=GRADE_CHOICES, blank=True)
+	grade = models.CharField(max_length=2, choices=GRADE_CHOICES, blank=True,null=True)
 
 class Schedule(models.Model) :
 	user = models.ForeignKey(User)
 	semester = models.ForeignKey(Semester)
-	classes_enrolled = models.ManyToManyField(Class)
+	classes_enrolled = models.ManyToManyField(EnrolledClass)
