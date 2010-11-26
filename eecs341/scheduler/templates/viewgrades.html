@@ -1,0 +1,21 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>View Grades</title>
+</head>
+
+<body>
+<h2> Grades for {{user.name}} in {{semester.name}} </h2>
+<table>
+<tr> <b> <td> Class </td> <td> Grade </td> </b> </tr>
+{%if classes%}
+{%for class in classes %}
+<tr> <td> {{class.class.name}} </td> <td> {% if class.grade != null %} {{class.grade}} {%endif%} </td> </tr>
+{% endfor %}
+{%else %}
+<tr> <td colspan="2"> <i> No classes found </i> </td> </tr>
+{%endif%}
+</table>
+</body>
+</html>

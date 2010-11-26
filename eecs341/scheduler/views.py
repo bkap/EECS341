@@ -50,3 +50,9 @@ def searchresults(request) :
 		queries['course__number__%s' % order] = course_num
 	return render_to_response("search.html",{'user':request.user,
 	'courses':Class.objects.filter(**queries)})
+
+def getgrades(request) :
+	if not request.user.is_authenticated :
+		return redirect_to('login.html')
+	semesters = [schedule.semester for schedule in Schedule.objects.filter(user=request.user)]
+	return render_to_response('select_semester_grades.html',{'user':request.user,'semesters':semesters})
