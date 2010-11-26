@@ -5,6 +5,7 @@ from django.core.context_processors import csrf
 from django.contrib.auth.models import User,Group
 from django.contrib.auth import authenticate, login
 from scheduler.models import *
+from django.contrib.auth.decorators import permission_required
 # Create your views here.
 def login_page(request) :
 	if request.method == 'GET' :
@@ -50,15 +51,13 @@ def searchresults(request) :
 		queries['course__number__%s' % order] = course_num
 	return render_to_response("search.html",{'user':request.user,
 	'courses':Class.objects.filter(**queries)})
-
+@permission_required('scheduler.can_enroll',login_url='/scheduler/login.html')
 def getgrades(request) :
-	if not request.user.is_authenticated() or not request.user.has_perm('can_enroll'):
-		return HttpResponse('This page is currently only available for students')
 	if request.GET.get('sem',None) != None :
 		sem = Semester.objects.get(name=request.GET['sem'])
 		sched = Schedule.objects.get(user=request.user, semester=sem)
 		if sched :
-			classes = sched.classes_enrolled
+			classes = sched.classes_enrolled.all()
 		else :
 			classes = []
 		return render_to_response('viewgrades.html',{'user':request.user, 'classes':classes})
