@@ -11,11 +11,11 @@ def login_page(request) :
 	if request.method == 'GET' :
 		c = {}
 		c.update(csrf(request))
-		if request.GET.get('next',None) :
+		if not request.GET.get('next',None) :
 			next = 'welcome.html'
 		else :
 			next = request.GET['next']
-		c.update('next',next)
+		c['next'] = next
 		return render_to_response('login.html',c)
 	else :
 		#TODO: handle redirection
@@ -76,9 +76,10 @@ def set_grades(request) :
 	klass = Class.objects.get(id=request.GET['class'])
 	if klass is None :
 		return HttpResponse("class not found")
-	admin = Group.get(name="SchoolAdmin")
+	admin = Group.objects.get(name="SchoolAdmin")
 	if klass.professor == request.user or admin in request.user.groups.all() :
 		enrolled = EnrolledClass.objects.filter(class_enrolled=klass)
-		return render_to_response('setgrades.html',{'class':klass,'enrolled':enrolled})
+		#TODO: grade_opts isn't working yet
+		return render_to_response('setgrades.html',{'class':klass,'enrolled':enrolled, 'grade_opts' = GRADE_CHOICES})
 	return HttpResponse("You don't have permission to view this page")
 

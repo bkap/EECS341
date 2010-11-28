@@ -5,5 +5,5 @@ urlpatterns = patterns('',
 	(r'welcome.html',hello),
 	(r'searchform.html',search_form),
 	(r'search.html',searchresults),
-	(r'grades.html',getgrades),
+	(r'^grades.html',getgrades),
 	(r'setgrades.html',set_grades),)
