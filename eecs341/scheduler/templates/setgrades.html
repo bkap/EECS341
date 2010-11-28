@@ -1,0 +1,19 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>Set Grades for {{class.id}}/title>
+</head>
+
+<body>
+	<h1> Setting grades for {{class.course.dept}} {{class.course.number}} : {{class.id}} </h1>
+    <form action="changegrades" method="post">
+    <table border="1">
+    {% for enrolledClass in enrolled %}
+    <tr> <td> {{enrolledClass.user.lastname}}, {{enrolledClass.user.firstname}} </td> <td> <select name="{{enrolledClass.user.username}}"> {% for option in grade_opts %} <option id="{{option[0]}}"> {{option[1]}} </option> {% endfor %} </select> </td> </tr>
+    {% endfor %}
+    </table>
+    <input type="submit" value="submit" />
+    </form>
+</body>
+</html>
