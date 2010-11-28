@@ -11,8 +11,14 @@ def login_page(request) :
 	if request.method == 'GET' :
 		c = {}
 		c.update(csrf(request))
+		if request.GET.get('next',None) :
+			next = 'welcome.html'
+		else :
+			next = request.GET['next']
+		c.update('next',next)
 		return render_to_response('login.html',c)
 	else :
+		#TODO: handle redirection
 		return HttpResponse("You've attempted to log in %s" %
 		request.POST['uname'])
 def hello(request) :
@@ -63,3 +69,16 @@ def getgrades(request) :
 		return render_to_response('viewgrades.html',{'user':request.user, 'classes':classes,'semester':sem})
 	semesters = [schedule.semester for schedule in Schedule.objects.filter(user=request.user)]
 	return render_to_response('select_semester_grades.html',{'user':request.user,'semesters':semesters})
+
+def set_grades(request) :
+	if request.GET.get('class',None) is None :
+		return HttpResponse("class not found")
+	klass = Class.objects.get(id=request.GET['class'])
+	if klass is None :
+		return HttpResponse("class not found")
+	admin = Group.get(name="SchoolAdmin")
+	if klass.professor == request.user or admin in request.user.groups.all() :
+		enrolled = EnrolledClass.objects.filter(class_enrolled=klass)
+		return render_to_response('setgrades.html',{'class':klass,'enrolled':enrolled})
+	return HttpResponse("You don't have permission to view this page")
+
