@@ -73,13 +73,16 @@ def getgrades(request) :
 def set_grades(request) :
 	if request.GET.get('class',None) is None :
 		return HttpResponse("class not found")
-	klass = Class.objects.get(id=request.GET['class'])
+	try :
+		klass = Class.objects.get(id=request.GET['class'])
+	except Class.DoesNotExist as e :
+		return HttpResponse("class not found")
 	if klass is None :
 		return HttpResponse("class not found")
 	admin = Group.objects.get(name="SchoolAdmin")
 	if klass.professor == request.user or admin in request.user.groups.all() :
+		print request.user.username
 		enrolled = EnrolledClass.objects.filter(class_enrolled=klass)
-		#TODO: grade_opts isn't working yet
-		return render_to_response('setgrades.html',{'class':klass,'enrolled':enrolled, 'grade_opts' = GRADE_CHOICES})
+		return render_to_response('setgrades.html',{'class':klass,'enrolled':enrolled, 'grade_opts' : zip(*EnrolledClass.GRADE_CHOICES)[0]})
 	return HttpResponse("You don't have permission to view this page")
 

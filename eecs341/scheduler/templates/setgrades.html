@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<title>Set Grades for {{class.id}}/title>
+<title>Set Grades for {{class.id}}</title>
 </head>
 
 <body>
@@ -10,7 +10,8 @@
     <form action="changegrades" method="post">
     <table border="1">
     {% for enrolledClass in enrolled %}
-    <tr> <td> {{enrolledClass.user.lastname}}, {{enrolledClass.user.firstname}} </td> <td> <select name="{{enrolledClass.user.username}}"> {% for option in grade_opts %} <option id="{{option[0]}}"> {{option[1]}} </option> {% endfor %} </select> </td> </tr>
+    <tr> <td> {{enrolledClass.student.last_name}}, {{enrolledClass.student.first_name}} </td> <td> <select name="{{enrolledClass.student.username}}"> <option id=""> </option>
+     {% for option in grade_opts %} <option id="{{option}}" {% if option == enrolledClass.grade %} selected="selected" {%endif%}> {{option}} </option> {% endfor %} </select> </td> </tr>
     {% endfor %}
     </table>
     <input type="submit" value="submit" />
