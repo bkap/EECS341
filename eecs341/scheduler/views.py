@@ -71,18 +71,31 @@ def getgrades(request) :
 	return render_to_response('select_semester_grades.html',{'user':request.user,'semesters':semesters})
 
 def set_grades(request) :
-	if request.GET.get('class',None) is None :
+	if getattr(request, request.method).get('class',None) is None :
 		return HttpResponse("class not found")
 	try :
-		klass = Class.objects.get(id=request.GET['class'])
+		klass = Class.objects.get(id=getattr(request, request.method)['class'])
 	except Class.DoesNotExist as e :
 		return HttpResponse("class not found")
 	if klass is None :
 		return HttpResponse("class not found")
 	admin = Group.objects.get(name="SchoolAdmin")
 	if klass.professor == request.user or admin in request.user.groups.all() :
-		print request.user.username
+		#we have permission to do this. Now let's differet between get and post
+		message = ''
+		if request.method == 'POST' :
+			for key in request.POST :
+				if key.startswith('student:') :
+					#we have a student grade
+					username = key.replace('student:','',1)
+					student = User.objects.get(username=username)
+					enrolled_class = EnrolledClass.objects.get(student=student, class_enrolled=klass)
+					enrolled_class.grade = request.POST[key]
+					enrolled_class.save()
+			message = 'grades updated'
 		enrolled = EnrolledClass.objects.filter(class_enrolled=klass)
-		return render_to_response('setgrades.html',{'class':klass,'enrolled':enrolled, 'grade_opts' : zip(*EnrolledClass.GRADE_CHOICES)[0]})
+		c = {'class':klass,'enrolled':enrolled, 'grade_opts' : zip(*EnrolledClass.GRADE_CHOICES)[0], 'message':message}
+		c.update(csrf(request))
+		return render_to_response('setgrades.html',c)
 	return HttpResponse("You don't have permission to view this page")
 
