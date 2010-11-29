@@ -6,11 +6,21 @@
 </head>
 
 <body>
+<h1> Search Results </h1>
+<form action="searchform.html" method="get" >
+<input type="submit" value="search again" />
+</form>
+{% if courses %}
 {%for class in courses %}
-<table>
+<table border="1">
 <tr> <td colspan="4"> <b>{{class.course.name}}</b></td> </tr>
 <tr> <td> {{class.course.dept}} {{class.course.number}} </td>
-		<td>{{class.professor.lastname}}, {{class.professor.firstname}} </td>
+		<td>
+        {% if class.professor %}
+        {{class.professor.last_name}}, {{class.professor.first_name}} 
+        {% else %}
+        tbd
+        {% endif %}</td>
         <td> {%if "0" in class.days_met %} M {%endif%}
         	 {% if "1" in class.days_met %} T {%endif %}
              {%if "2" in class.days_met %} W {%endif %}
@@ -19,8 +29,12 @@
          </td>
         <td> {{class.start_time_met|time:"H:i"}} - {{class.end_time_met|time:"H:i"}} </td>
  </tr>
+ <tr> <td colspan="4"> {{class.description}} </td> </tr>
 </table>
 <br />
 {%endfor%}
+{% else %}
+<i> No classes Found </i>
+{% endif %}
 </body>
 </html>

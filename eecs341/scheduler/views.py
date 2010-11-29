@@ -51,10 +51,11 @@ def searchresults(request) :
 	if professor:
 		queries['professor'] = professor
 	order = request.GET['ratio']
-	if order == 'eq' :
-		queries['course__number'] = course_num
-	else :
-		queries['course__number__%s' % order] = course_num
+	if course_num :
+		if order == 'eq' :
+			queries['course__number'] = course_num
+		else :
+			queries['course__number__%s' % order] = course_num
 	return render_to_response("search.html",{'user':request.user,
 	'courses':Class.objects.filter(**queries)})
 @permission_required('scheduler.can_enroll',login_url='/scheduler/login.html')
