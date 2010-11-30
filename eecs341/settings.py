@@ -2,7 +2,7 @@
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
-
+LOGIN_REDIRECT_URL = 'scheduler/welcome.html'
 ADMINS = (
     # ('Your Name', 'your_email@domain.com'),
 )

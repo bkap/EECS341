@@ -1,11 +1,11 @@
 import models
 from django.http import HttpResponse
-from django.shortcuts import render_to_response
+from django.shortcuts import render_to_response, redirect
 from django.core.context_processors import csrf
 from django.contrib.auth.models import User,Group
 from django.contrib.auth import authenticate, login
 from scheduler.models import *
-from django.contrib.auth.decorators import permission_required
+from django.contrib.auth.decorators import permission_required, login_required
 # Create your views here.
 def login_page(request) :
 	if request.method == 'GET' :
@@ -19,22 +19,44 @@ def login_page(request) :
 		return render_to_response('login.html',c)
 	else :
 		#TODO: handle redirection
-		return HttpResponse("You've attempted to log in %s" %
-		request.POST['uname'])
-def hello(request) :
-	if request.method == 'POST' :
 		user = authenticate(username=request.POST['uname'], password=request.POST['pword'])
 		if user is not None and user.is_active :
 			login(request, user)
-			return render_to_response('welcome.html',{'user':user})
+			return redirect(request.POST.get('next','welcome.html'),False)
+				#bring them to the welcome page
 		else :
-			return HttpResponse("Login unsuccesful. Press back and try again")
-	else :
-		
-		if request.user.is_authenticated() :
-			return render_to_response('welcome.html',{'user':request.user})
+				return HttpResponse("Login Unsuccessful. Please press back and try again")
+@login_required()
+def hello(request) :
+		#check to see if the user is a student
+		import datetime
+		sem = Semester.objects.filter(start_date__gt=datetime.datetime.today(), end_date__lt=datetime.datetime.today())
+		if sem :
+			cur_sem = sem[0]
 		else :
-			return HttpResponse("Please Login")	
+			sem = Semester.objects.filter(start_date__gt=datetime.datetime.today()).order_by('start_date')
+			if sem :
+				cur_sem = sem[0]
+			else :
+				cur_sem = None
+		if request.user.groups.filter(name="Student") :
+			#we are a student. Let's get your schedule
+			if cur_sem :
+				schedule = Schedule.objects.filter(user=request.user,semester=cur_sem)
+				if schedule :
+					classes = [klass.class_enrolled for klass in schedule[0].classes_enrolled.all().order_by('class_enrolled__start_time_met')]
+					print "found classes:%s" % classes
+				else :
+					classes = None
+			else :
+				classes = None
+			return render_to_response("welcome-student.html",{"user":request.user,
+				"classes":classes,"semester":cur_sem})
+		elif request.user.groups.filter(name="Teacher") :
+			pass
+		elif request.user.groups.filter(name="SchoolAdmin") :
+			pass
+		return render_to_response('welcome.html',{'user':request.user})
 
 def search_form(request) :
 	return render_to_response('searchform.html',{'semesters':Semester.objects.all()})
