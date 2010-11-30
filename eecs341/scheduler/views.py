@@ -52,8 +52,12 @@ def hello(request) :
 				classes = None
 			return render_to_response("welcome-student.html",{"user":request.user,
 				"classes":classes,"semester":cur_sem})
-		elif request.user.groups.filter(name="Teacher") :
-			pass
+		elif request.user.groups.filter(name="Professor") :
+			if cur_sem :
+				classes = Class.objects.filter(professor=request.user, semester=cur_sem)
+			else :
+				classes = None
+			return render_to_response('welcome-prof.html',{'user':request.user, 'classes':classes,'semester':cur_sem})
 		elif request.user.groups.filter(name="SchoolAdmin") :
 			pass
 		return render_to_response('welcome.html',{'user':request.user})
