@@ -1,0 +1,30 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>Course Scheduler</title>
+</head>
+
+<body>
+<h2> Welcome {{user.first_name}} {{user.last_name}} </h2>
+{% if semester %}
+<table border="2">
+<tr> <td colspan="2"> <strong> Classes for {{semester.name}} </strong> </td> </tr>
+<tr> <td><strong>Class </strong></td><td><strong>Time</strong></td></tr>
+{% if classes %}
+{% for class in classes %}
+<tr> <td> {{class.course.dept}} {{class.course.number}} </td><td> {{class.start_time_met|time:"H:i"}} - {{class.end_time_met|time:"H:i"}} <br />{{class.room }} </td> </tr>
+{% endfor %}
+{% else %}
+<tr> <td colspan="2"> <i> No Classes Found for Semester </i> </td> </tr>
+{% endif %}
+</table>
+{% else %}
+<i> No Classes Found </i>
+{% endif %}
+<br />
+<a href="/scheduler/searchform.html"> Search for classes </a> <br />
+<a href="/scheduler/grades.html"> View Grades </a>
+
+</body>
+</html>
