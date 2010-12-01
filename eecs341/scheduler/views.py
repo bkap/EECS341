@@ -97,6 +97,30 @@ def getgrades(request) :
 	semesters = [schedule.semester for schedule in Schedule.objects.filter(user=request.user)]
 	return render_to_response('select_semester_grades.html',{'user':request.user,'semesters':semesters})
 
+@permission_required('scheduler.can_enroll')
+def enroll_in_class(request) :
+	#first, let's get the class
+	klass = Class.objects.get(id=request.POST['class'])
+	#now let's see if we are allowed to enroll
+	sem = klass.semester
+	today = datetime.datetime.today()
+	if sem.reg_start_date > today or sem.reg_end_date < today :
+		return HttpResponse("Sorry, enrollment for this semester has ended")
+	#now let's see if there is enough room in the class
+	students_enrolled = EnrolledCless.objects.filter(class_enrolled=klass)
+	if len(students_enrolled) >= klass.max_capacity :
+		return HttpResponse("Class add failed- no room in the class")
+	#now check the student's schedule
+	schedule = Schedule.objects.get_or_create(user=request.user, semester=sem)
+	for enrolledKlass in schedule.classes_enrolled.objects.all() :
+		if klass.start_time_met >enrolledKlass.class_enrolled.start_time_met and klass.start_time_met < enrolledKlass.class_enrolled.end_time_met :
+			return HttpResponse("Unable to enroll: You have a conflict with %s" klass.course)
+	#alright, looks like we're ok to add.
+	newclass = EnrolledClass(user=request.user, class_enrolled=klass)
+	newclass.save()
+	schedule.classes_enrolled.append(newclass)
+	schedule.save()
+	return HttpResponse("Now enrolled in %s" % klass)
 def set_grades(request) :
 	if getattr(request, request.method).get('class',None) is None :
 		return HttpResponse("class not found")
