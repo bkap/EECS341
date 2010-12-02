@@ -1,0 +1,141 @@
+\documentclass[11pt,oneside,a4paper]{article}
+\usepackage{textcomp}
+\usepackage{setspace}
+\usepackage{graphicx}
+\title{EECS 341 Database Project: Class Scheduler}
+\begin{document}
+\maketitle
+\section{Introduction}
+This project is a course scheduling program for students at a University
+(similar to the Student Information System that Case uses, but one that doesn't
+take as long to execute queries).
+\section{Application Requirements Specifications}
+The application has three classes of users: Students, Professors, and
+Administrators. Each has a set of actions that they will be able to perform.
+\subsection{Administrators}
+Administrators are able to add new users, define new semesters, create new
+courses and classes, view and set the grades of any student, and enroll students in
+classes.
+\subsection{Professors}
+Professors are capable of being listed as teaching classes. They are able to
+view and set the grades of the students for the classes taught by the
+professor. They are capable of enrolling students in classes that they teach.
+\subsection{Students}
+Students are capable of enrolling in classes, provided the class is not at its
+maximum capacity, and viewing their own grades.
+\subsection{All users}
+All users can search the database of classes. They can see basic information
+about the class as well as viewing who is enrolled in each class.
+
+\section{Database Requirements Specification}
+\subsection{Tables}
+User(\underline{username: varchar(30)},firstname: varchar, lastname: varchar,
+password: Pass	word, usertype: Enum(Student,Professor,Admin)
+\\
+Semester(\underline{name:
+varchar},start\_date:date,end\_date:date,reg\_start\_date:date,reg\_end\_date:date)
+\\
+Course(\underline{courseID	: Integer},name:varchar,dept:varchar(4), number:
+SmallInt, prereq: Integer (ForeignKey to Course), description: text)
+\\
+Class(\underline{classNumber: Integer}, semester: varchar (ForeignKey to
+Semester), days\_met : varchar(5), start\_time\_met : Time, end\_time\_met:
+Time, course: Integer (ForeignKey to Course), professor: varchar(30)
+(ForeignKey to User), max\_class\_size: Integer, buildingName: varchar,
+roomNum: Integer)
+\\
+EnrolledClass(\underline{student: varchar(30) (Foreign Key to User),
+class\_enrolled : Integer (Foreign Key to Class)}, grade: SmallInt)
+\\
+Schedule(\underline{user: varchar(30) (ForeignKey to User), semester: varchar
+(ForeignKey to Semester), class\_enrolled: Integer(ForeignKey to Class)}) <-
+Join table, to get the list of classes the user is enrolled in for a specific
+semester
+\\
+CoursesTaken(\underline{student: varchar(30) (ForeignKey to User), courseID:
+Integer}) <-- a list of the clases the student has taken\\
+Room(\underline{buildingName: varchar, roomNumber: Integer}, max\_capacity:
+Integer)
+\subsection{Constraints}
+	* on create Class, Class.professor.usertype = Professor. Will happen pretty
+	frequently- every time classes are created for the new semester\\
+	* on create EnrolledClass, EnrolledClass.student.usertype = Student. Will
+	happen frequently- for each class each student goes to enroll in.\\
+	* on create Schedule, ensure Schedule.class\_enrolled.semester =
+	Schedule.semester\\
+	* On create EnrolledClass, if class\_enrolled.course.prereq is not NULL, ensure
+	that there exists (SELECT * FROM CoursesTaken T where T.user =
+	EnrolledClass.user and T.courseID =
+	class\_enrolled.course.prereq.courseID\\
+	* On create Class, if buildingName and roomNumber are not NULL, ensure that
+	there does not exist a Class in the same room at the same time in the same
+	semester, and ensure that Class.max\_class\_size <= Room.max\_capacity
+\subsection{Triggers}
+	* On create EnrolledClass, if user already has class scheduled for that
+	time (check Schedule), cancel the create. Otherwise, add Schedule (user, class.semester,
+	EnrolledClass). 
+\section{ER data model design}
+List the entities and their attributes. Specify the domain of each attribute. Specify the properties of each attribute (i.e., key, foreign key, composite/simple, single-valued/multi-valued, derived, incomplete with different nulls, roles, weak/strong entity type, etc.). Specify the relationships and their attributes. List the properties of each relationship (i.e., degree of the relationship, cardinality ratios (1-1, 1-N, N-M), participation constraints (total, partial), other application-specific constraints, etc.). Your ER model should have at least 5 entity types, 7 relationship types, and sufficiently many attributes and constraints of different types. Draw the E-R diagram, and incorporate everything discussed in this step into the E-R diagram. 
+
+\subsection{Entities}
+The ER diagram is attached. There are 7 Entities in our model: User, Class, Course, Semester, Schedule, Room, Department.  They are listed below in the following form:
+\\
+entityName(\underline{primaryKeyAttribute: attributeType}, attributeName: attributeDomain, foreignKeyAttribute: foreignKeyDomain(Foreign Key to Entity))
+\\
+User(\underline{username: varchar(30)},firstname: varchar, lastname: varchar, password: Pass	word, usertype: Enum(Student,Professor,Admin)
+\\
+The User has the following attributes: username, firstname, lastname, 
+password, usertype.encompases students, professors and administrators.  
+Each user will have a first and last name. Since logging into the system 
+will require authentication there will be a password for each user.
+\\
+Class(\underline{classNumber: Integer}, semester: varchar (ForeignKey to
+Semester), days\_met : varchar(5), start\_time\_met : Time, end\_time\_met:
+Time, course: Integer (ForeignKey to Course), professor: varchar(30)
+(ForeignKey to User), max\_class\_size: Integer, buildingName: varchar,
+roomNum: Integer)
+\\
+Course(\underline{courseID	: Integer},name:varchar,dept:varchar(4), 
+number: SmallInt, prereq: Integer (ForeignKey to Course), description: text)
+\\
+Semester(\underline{name: varchar},start\_date:date,end\_date: date, 
+reg\_start\_date: date,reg\_end\_date:date)
+\\
+Schedule(\underline{user: varchar(30) (ForeignKey to User), semester: varchar\&
+(ForeignKey to Semester), class\_enrolled: Integer(ForeignKey to Class)})\& \<-
+Join table, to get the list of classes the user is enrolled in for a specific
+semester
+\\
+Room(\underline{buildingName: varchar, roomNumber: Integer}, max\_capacity: Integer)
+Department(\underline{name: varchar(4)}, professor: User(foreign key to user))
+\subsection{Relations} 
+Each entity is related to several others in our model.  This section lists and describes 
+all of the relations as well as their cardinality. 
+\\
+\subsubsection{User has Schedules (1:N)}
+Each user can have a schedule if they are a student.  this relation "has" does not have
+ any attribues. The cardinality is one to many because a stduent(user) can have 1 
+schedule for each semester. student's do not have to have any schedules.  If they have not
+ registered for any classes they will not yet have a schedule.  In this case, we need to 
+ensure that there is a constraint on the database that does not show the schedule of the 
+student if they do not yet have one.  
+\subsubsection{User is a part of Department (1:1)}
+If a user is a teacher (or student?) then they may be a part of the a department.
+ The cardinality of this relation is one to one; each teacher may only belong to 
+one department.
+\subsubsection{user attends/teaches/creates class N:M}
+All users will will be related to teachers based on their type.  Student's enroll and 
+attend classes, Teachers teach classes, and administrators create classes.  Any users 
+of these three types can be associated with multiple classes additionally any class 
+can be assosiciated with multiple users, therefore the cardinality is many to many. 
+Finally this relation has an attribute: grade.  Grades are given to students who 
+finish the class. This attribute is assigned by teacher.
+\subsubsection{Schedule contains Classes (N:M)}
+!!!!WARNING!!! - THIS MIGHT BE WRONG? SHOULD IT BE 1:N?
+\\
+A schedule is a list of classes that a user is enrolled in for a specific semester.  Each schedule can contain multiple classes.  Each class can be in multiple schedules. Therefore, the cardinality is many to many. 
+\subsubsection{Class in a Room (N:1)}
+Each class must be held in a Room.  The cardinality of this relationship is many to one.  The reasoning for this is that each room can have multiple classes. However, each class is distinguished by its meeting place and time in additionto other variables.  So there can only be one room for each class.  
+
+\end{document}
+
