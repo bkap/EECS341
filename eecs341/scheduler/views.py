@@ -100,7 +100,7 @@ def getgrades(request) :
 @permission_required('scheduler.can_enroll')
 def enroll_in_class(request) :
 	#first, let's get the class
-	klass = Class.objects.get(id=request.POST['class'])
+	klass = Class.objects.get(id=request.GET['class'])
 	#now let's see if we are allowed to enroll
 	sem = klass.semester
 	today = datetime.datetime.today()
@@ -114,13 +114,15 @@ def enroll_in_class(request) :
 	schedule = Schedule.objects.get_or_create(user=request.user, semester=sem)
 	for enrolledKlass in schedule.classes_enrolled.objects.all() :
 		if klass.start_time_met >enrolledKlass.class_enrolled.start_time_met and klass.start_time_met < enrolledKlass.class_enrolled.end_time_met :
-			return HttpResponse("Unable to enroll: You have a conflict with %s" klass.course)
+			return HttpResponse("Unable to enroll: You have a conflict with %s"  % klass.course)
 	#alright, looks like we're ok to add.
 	newclass = EnrolledClass(user=request.user, class_enrolled=klass)
 	newclass.save()
 	schedule.classes_enrolled.append(newclass)
 	schedule.save()
 	return HttpResponse("Now enrolled in %s" % klass)
+
+
 def set_grades(request) :
 	if getattr(request, request.method).get('class',None) is None :
 		return HttpResponse("class not found")
@@ -136,7 +138,7 @@ def set_grades(request) :
 		message = ''
 		if request.method == 'POST' :
 			for key in request.POST :
-				if key.startswith('student:') :
+				if key.startswith('student:') and request.POST[key]:
 					#we have a student grade
 					username = key.replace('student:','',1)
 					student = User.objects.get(username=username)
