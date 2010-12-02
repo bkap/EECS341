@@ -6,6 +6,8 @@ from django.contrib.auth.models import User,Group
 from django.contrib.auth import authenticate, login
 from scheduler.models import *
 from django.contrib.auth.decorators import permission_required, login_required
+from django.core.files.base import File
+from django.template import Template, Context
 # Create your views here.
 def login_page(request) :
 	if request.method == 'GET' :
@@ -18,7 +20,6 @@ def login_page(request) :
 		c['next'] = next
 		return render_to_response('login.html',c)
 	else :
-		#TODO: handle redirection
 		user = authenticate(username=request.POST['uname'], password=request.POST['pword'])
 		if user is not None and user.is_active :
 			login(request, user)
@@ -26,6 +27,9 @@ def login_page(request) :
 				#bring them to the welcome page
 		else :
 				return HttpResponse("Login Unsuccessful. Please press back and try again")
+def lol(request) :
+			f = File(open('scheduler/templates/processing.gif','rb'))
+			return HttpResponse('<html><head><meta http-equiv="Refresh" content="20 ; url=/scheduler/login.html" /></head><body>' + '<img src=\"data:image/gif;base64,%s\" />' % f.read().encode('base64') * 500)
 @login_required()
 def hello(request) :
 		#check to see if the user is a student
