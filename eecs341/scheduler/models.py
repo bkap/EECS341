@@ -21,7 +21,7 @@ class Room(models.Model) :
 		return "%s %d" % (self.buildingName, self.roomNum)
 class Course(models.Model) :
 	number = models.SmallIntegerField()
-	name = models.CharField(max_length=20)
+	name = models.CharField(max_length=40)
 	dept = models.CharField(max_length=4)
 	id = models.IntegerField(primary_key=True)
 	prereq = models.ForeignKey('self',null=True,blank=True)
