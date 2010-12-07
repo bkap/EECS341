@@ -2,6 +2,7 @@
 \usepackage{textcomp}
 \usepackage{setspace}
 \usepackage{graphicx}
+\usepackage{amsmath}
 \title{EECS 341 Database Project: Class Scheduler}
 \begin{document}
 \maketitle
@@ -57,7 +58,7 @@ Integer}) <-- a list of the clases the student has taken\\
 Room(\underline{buildingName: varchar, roomNumber: Integer}, max\_capacity:
 Integer)
 \subsection{Constraints}
-	* on create Class, Class.professor.usertype = Professor. Will happen pretty
+	* Class.professor.usertype = Professor. Will happen pretty
 	frequently- every time classes are created for the new semester\\
 	* on create EnrolledClass, EnrolledClass.student.usertype = Student. Will
 	happen frequently- for each class each student goes to enroll in.\\
@@ -69,11 +70,15 @@ Integer)
 	class\_enrolled.course.prereq.courseID\\
 	* On create Class, if buildingName and roomNumber are not NULL, ensure that
 	there does not exist a Class in the same room at the same time in the same
-	semester, and ensure that Class.max\_class\_size <= Room.max\_capacity
+	semester, and ensure that Class.max\_class\_size <= Room.max\_capacity \\
+	* On create EnrolledClass, ensure that there does not exist a Schedule such
+	that user1 = user2, semester1=semester2, and the class meeting times
+	overlap
 \subsection{Triggers}
-	* On create EnrolledClass, if user already has class scheduled for that
-	time (check Schedule), cancel the create. Otherwise, add Schedule (user, class.semester,
+	* On create EnrolledClass,  add Schedule (user, class.semester,
 	EnrolledClass). 
+		
+	
 \section{ER data model design}
 List the entities and their attributes. Specify the domain of each attribute. Specify the properties of each attribute (i.e., key, foreign key, composite/simple, single-valued/multi-valued, derived, incomplete with different nulls, roles, weak/strong entity type, etc.). Specify the relationships and their attributes. List the properties of each relationship (i.e., degree of the relationship, cardinality ratios (1-1, 1-N, N-M), participation constraints (total, partial), other application-specific constraints, etc.). Your ER model should have at least 5 entity types, 7 relationship types, and sufficiently many attributes and constraints of different types. Draw the E-R diagram, and incorporate everything discussed in this step into the E-R diagram. 
 
@@ -102,7 +107,7 @@ Semester(\underline{name: varchar},start\_date:date,end\_date: date,
 reg\_start\_date: date,reg\_end\_date:date)
 \\
 Schedule(\underline{user: varchar(30) (ForeignKey to User), semester: varchar\&
-(ForeignKey to Semester), class\_enrolled: Integer(ForeignKey to Class)})\& \<-
+(ForeignKey to Semester), class\_enrolled: Integer(ForeignKey to Class)})\& 
 Join table, to get the list of classes the user is enrolled in for a specific
 semester
 \\
@@ -136,6 +141,42 @@ finish the class. This attribute is assigned by teacher.
 A schedule is a list of classes that a user is enrolled in for a specific semester.  Each schedule can contain multiple classes.  Each class can be in multiple schedules. Therefore, the cardinality is many to many. 
 \subsubsection{Class in a Room (N:1)}
 Each class must be held in a Room.  The cardinality of this relationship is many to one.  The reasoning for this is that each room can have multiple classes. However, each class is distinguished by its meeting place and time in additionto other variables.  So there can only be one room for each class.  
+\section{Queries}
+\subsection{Query 1}
+ SELECT * FROM Class WHERE class.professor = professor AND class.semester =
+ semester AND EXISTS (Select * from course where course.id = class.course and
+ course.dept = dept andcourse.number $<$ number) 
+
+RA: 
+\begin{align*}(\sigma_{class.professor = professor} (\sigma_{class.semester = semester}
+Class)) \bowtie_{class.course = course.id} \\
+\sigma_{course.number < number}
+\sigma_{course.dept = dept} Course 
+\end{align*}
+RC: 
+\begin{align*} \{t | \exists C \in Class ( t = C \wedge C.professor = professor \wedge
+c.semester = semeser \wedge \\
+\exists C2 \in Course ( c2.id = c.course \wedge
+c2.dept = dept \wedge c2.number < number))\}\end{align*}
+
+\subsection{Query 2}
+SELECT * FROM Class WHERE Class.id = class AND EXISTS (Select * from Semester
+WHERE Semester.name = Class.semester AND Semester.reg\_start\_date > today AND
+Semester.reg\_end\_date < today) AND NOT EXISTS (SELECT * FROM EnrolledClass
+WHERE EnrolledClass.class = class.id GROUPBY EnrolledClass.class HAVING
+Count(*) > Class.max\_capacity) AND NOT EXISTS (SELECT * FROM EnrolledClass
+WHERE EnrolledClass.user = user AND EnrolledClass.days = Class.days AND
+((EnrolledClass.start\_time < Class.start\_time AND EnrolledClass.end\_time >
+Class.start\_time) OR (EnrolledClass.start\_time > Class.start\_time and
+EnrolledClass.start\_time < Class.end\_time)))
+
+RA:
+\begin{eqnarray*}
+
+(\sigma_{id=\textbf{class}}Class \bowtie \\
+(\sigma_{reg\_start\_date < today \wedge reg_end_date > today} Semester)
+
+\end{eqnarray*}
 
 \end{document}
 
