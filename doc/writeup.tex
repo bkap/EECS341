@@ -31,10 +31,9 @@ about the class as well as viewing who is enrolled in each class.
 \section{Database Requirements Specification}
 \subsection{Tables}
 User(\underline{username: varchar(30)},firstname: varchar, lastname: varchar,
-password: Pass	word, usertype: Enum(Student,Professor,Admin)
+password: Pass	word, usertype: Enum(Student,Professor,Admin))
 \\
-Semester(\underline{name:
-varchar},start\_date:date,end\_date:date,reg\_start\_date:date,reg\_end\_date:date)
+Semester(\underline{name: varchar},start\_date:date,end\_date:date,reg\_start\_date:date,reg\_end\_date:date)
 \\
 Course(\underline{courseID	: Integer},name:varchar,dept:varchar(4), number:
 SmallInt, prereq: Integer (ForeignKey to Course), description: text)
@@ -45,38 +44,14 @@ Time, course: Integer (ForeignKey to Course), professor: varchar(30)
 (ForeignKey to User), max\_class\_size: Integer, buildingName: varchar,
 roomNum: Integer)
 \\
-EnrolledClass(\underline{student: varchar(30) (Foreign Key to User),
-class\_enrolled : Integer (Foreign Key to Class)}, grade: SmallInt)
+EnrolledClass(\underline{student: varchar(30) (Foreign Key to User), class\_enrolled : Integer (Foreign Key to Class)}, grade: SmallInt)
 \\
-Schedule(\underline{user: varchar(30) (ForeignKey to User), semester: varchar
-(ForeignKey to Semester), class\_enrolled: Integer(ForeignKey to Class)}) <-
-Join table, to get the list of classes the user is enrolled in for a specific
-semester
+Schedule(\underline{user: varchar(30) (ForeignKey to User), semester: varchar(ForeignKey to Semester), class\_enrolled: Integer(ForeignKey to Class)})
 \\
-CoursesTaken(\underline{student: varchar(30) (ForeignKey to User), courseID:
-Integer}) <-- a list of the clases the student has taken\\
+CoursesTaken(\underline{student: varchar(30) (ForeignKey to User), courseID: Integer}) \\
 Room(\underline{buildingName: varchar, roomNumber: Integer}, max\_capacity:
 Integer)
-\subsection{Constraints}
-	* Class.professor.usertype = Professor. Will happen pretty
-	frequently- every time classes are created for the new semester\\
-	* on create EnrolledClass, EnrolledClass.student.usertype = Student. Will
-	happen frequently- for each class each student goes to enroll in.\\
-	* on create Schedule, ensure Schedule.class\_enrolled.semester =
-	Schedule.semester\\
-	* On create EnrolledClass, if class\_enrolled.course.prereq is not NULL, ensure
-	that there exists (SELECT * FROM CoursesTaken T where T.user =
-	EnrolledClass.user and T.courseID =
-	class\_enrolled.course.prereq.courseID\\
-	* On create Class, if buildingName and roomNumber are not NULL, ensure that
-	there does not exist a Class in the same room at the same time in the same
-	semester, and ensure that Class.max\_class\_size <= Room.max\_capacity \\
-	* On create EnrolledClass, ensure that there does not exist a Schedule such
-	that user1 = user2, semester1=semester2, and the class meeting times
-	overlap
-\subsection{Triggers}
-	* On create EnrolledClass,  add Schedule (user, class.semester,
-	EnrolledClass). 
+
 		
 	
 \section{ER data model design}
@@ -87,7 +62,8 @@ The ER diagram is attached. There are 7 Entities in our model: User, Class, Cour
 \\
 entityName(\underline{primaryKeyAttribute: attributeType}, attributeName: attributeDomain, foreignKeyAttribute: foreignKeyDomain(Foreign Key to Entity))
 \\
-User(\underline{username: varchar(30)},firstname: varchar, lastname: varchar, password: Pass	word, usertype: Enum(Student,Professor,Admin)
+User(\underline{username: varchar(30)},firstname: varchar, lastname: varchar,
+password: Pass	word, usertype: Enum(Student,Professor,Admin))
 \\
 The User has the following attributes: username, firstname, lastname, 
 password, usertype.encompases students, professors and administrators.  
@@ -106,12 +82,8 @@ number: SmallInt, prereq: Integer (ForeignKey to Course), description: text)
 Semester(\underline{name: varchar},start\_date:date,end\_date: date, 
 reg\_start\_date: date,reg\_end\_date:date)
 \\
-Schedule(\underline{user: varchar(30) (ForeignKey to User), semester: varchar\&
-(ForeignKey to Semester), class\_enrolled: Integer(ForeignKey to Class)})\& 
-Join table, to get the list of classes the user is enrolled in for a specific
-semester
-\\
-Room(\underline{buildingName: varchar, roomNumber: Integer}, max\_capacity: Integer)
+Room(\underline{buildingName: varchar, roomNumber: Integer}, max\_capacity:
+Integer)\\
 Department(\underline{name: varchar(4)}, professor: User(foreign key to user))
 \subsection{Relations} 
 Each entity is related to several others in our model.  This section lists and describes 
@@ -140,7 +112,39 @@ finish the class. This attribute is assigned by teacher.
 \\
 A schedule is a list of classes that a user is enrolled in for a specific semester.  Each schedule can contain multiple classes.  Each class can be in multiple schedules. Therefore, the cardinality is many to many. 
 \subsubsection{Class in a Room (N:1)}
-Each class must be held in a Room.  The cardinality of this relationship is many to one.  The reasoning for this is that each room can have multiple classes. However, each class is distinguished by its meeting place and time in additionto other variables.  So there can only be one room for each class.  
+Each class must be held in a Room.  The cardinality of this relationship is many to one.  The reasoning for this is that each room can have multiple classes. However, each class is distinguished by its meeting place and time in additionto other variables.  So there can only be one room for each class. 
+\section{ER Integrity Constraints}
+\subsection{Constraints}
+\begin{itemize}
+	\item Class.professor.usertype = Professor. Will happen pretty
+	frequently- every time classes are created for the new semester\\
+	\item on create EnrolledClass, EnrolledClass.student.usertype = Student. Will
+	happen frequently- for each class each student goes to enroll in.\\
+	\item on create Schedule, ensure Schedule.class\_enrolled.semester =
+	Schedule.semester\\
+	\item On create EnrolledClass, if class\_enrolled.course.prereq is not NULL, ensure
+	that there exists (SELECT * FROM CoursesTaken T where T.user =
+	EnrolledClass.user and T.courseID =
+	class\_enrolled.course.prereq.courseID)\\
+	\item On create Class, if buildingName and roomNumber are not NULL, ensure that
+	there does not exist a Class in the same room at the same time in the same
+	semester, and ensure that Class.max\_class\_size <= Room.max\_capacity \\
+	\item On create EnrolledClass, ensure that there does not exist a Schedule such
+	that user1 = user2, semester1=semester2, and the class meeting times
+	overlap
+
+\end{itemize}
+
+The Foreign Keys will be enforced through the Database. We are using an
+Object-Relational Manager so it takes care of these for us.
+
+All of the other constraints will be enforced through the application's code. This is especially important because
+Admins need the ability to violate some of these constraints (for instance, to
+enroll students in courses that are already at max\_capacity)
+\subsection{Triggers}
+	* On create EnrolledClass,  add Schedule (user, class.semester,
+	EnrolledClass). 
+
 \section{Queries}
 \subsection{Query 1}
  SELECT * FROM Class WHERE class.professor = professor AND class.semester =
@@ -156,27 +160,92 @@ Class)) \bowtie_{class.course = course.id} \\
 RC: 
 \begin{align*} \{t | \exists C \in Class ( t = C \wedge C.professor = professor \wedge
 c.semester = semeser \wedge \\
-\exists C2 \in Course ( c2.id = c.course \wedge
+\exists C2 \in Course ( c2.id = c.course \wedge \\
 c2.dept = dept \wedge c2.number < number))\}\end{align*}
 
 \subsection{Query 2}
-SELECT * FROM Class WHERE Class.id = class AND EXISTS (Select * from Semester
-WHERE Semester.name = Class.semester AND Semester.reg\_start\_date > today AND
-Semester.reg\_end\_date < today) AND NOT EXISTS (SELECT * FROM EnrolledClass
-WHERE EnrolledClass.class = class.id GROUPBY EnrolledClass.class HAVING
-Count(*) > Class.max\_capacity) AND NOT EXISTS (SELECT * FROM EnrolledClass
-WHERE EnrolledClass.user = user AND EnrolledClass.days = Class.days AND
-((EnrolledClass.start\_time < Class.start\_time AND EnrolledClass.end\_time >
-Class.start\_time) OR (EnrolledClass.start\_time > Class.start\_time and
-EnrolledClass.start\_time < Class.end\_time)))
+(For this query, class, user, and today are parameters of the query chosen by
+the user) \\
+SELECT * FROM Class WHERE Class.id = class AND EXISTS (SELECT * FROM Semester WHERE Semester.name = Class.semester AND Semester.reg\_start\_date $<$ today AND Semester.reg\_end\_date $>$ today) AND NOT EXISTS (SELECT * FROM EnrolledClass WHERE EnrolledClass.class = class.id GROUP BY EnrolledClass.class HAVING Count(*) $>$ Class.max\_capacity) AND NOT EXISTS (SELECT * FROM EnrolledClass EC2,Class C2 WHERE EC2.user = user AND C2.id = EC2.class AND C2.semester = Semester.name AND C2.days\_met = Class.days\_met AND (C2.start\_time $<$ Class.start\_time AND C2.end\_time $>$ Class.start\_time) OR (C2.start\_time $>$ Class.start\_time and C2.start\_time $<$ Class.end\_time)) AND EXISTS (SELECT * FROM Course where Course.id = Class.course AND (Course.prereq = NULL OR EXISTS (SELECT * From EnrolledClass ec3, Class c3 WHERE ec3.user = user and ec3.class = c3.id AND c3.course = Course.prereq)))
 
 RA:
-\begin{eqnarray*}
 
-(\sigma_{id=\textbf{class}}Class \bowtie \\
-(\sigma_{reg\_start\_date < today \wedge reg_end_date > today} Semester)
 
-\end{eqnarray*}
+RC:
+\begin{align*} \{ t | & \exists C, Co | \{Class(C) \wedge C.id = t.id
+  \wedge \\
+ &  Course(Co)  \wedge Co.id = C.course \wedge
+    \\
+ &  \exists S | \{Semester(S) \wedge S.name = C.semester \wedge \\
+&   S.reg\_start\_date < today \wedge S.reg\_end\_date > today\} \wedge \\
+ &  \neg \exists EC2, C2 | \{EnrolledClass(EC2) \wedge Class(C2) \wedge\\
+&   EC2.user = user \wedge C2.days = C.days \wedge \\
+&   ((C2.start\_time < C.start\_time \wedge C2.end\_time > C.start\_time ) \vee \\
+&  (C2.start\_time > C.start\_time \wedge C2.start\_time < C.end\_time))\} \wedge
+  \\
+&   COUNT(E | \{EnrolledClass(E) \wedge E.class = C.id \}) < C.max\_capacity \wedge \\
+&  (co.prereq = NULL \vee \exists EC3, C3 | \{EnrolledClass(EC3) \wedge \\
+&   Class(C3)
+  \wedge EC3.user = user \wedge EC3.class = c3.id \wedge C3.course =
+  co.prereq\})\}\}
+\end{align*}
 
+\section{Functional Dependencies and 3NF}
+
+
+\subsection{Semester}
+\hspace{0.5in}name$\rightarrow$ start\_date, end\_date, reg\_start\_date, reg\_end\_date  
+
+
+\subsection{Room}
+\hspace*{0.5in}buildingname, roomnum $\rightarrow$ max\_capacity
+
+
+\subsection{Course}
+\hspace*{0.5in}dept, number$\rightarrow$name, prereq, description \\
+\hspace*{0.5in}dept$\rightarrow$id \\
+\hspace*{0.5in}id$\rightarrow$(everything\_else) 
+
+
+\subsection{Class}
+\hspace*{0.5in}id$\rightarrow$semester, days\_met, start\_time\_met, end\_time\_met, class\_size,course, professor, room, max\_class\_size \\
+\hspace*{0.5in}semester, room, start\_time\_met, days\_met $\rightarrow$(everything else) \\
+\hspace*{0.5in}semeseter, room, end\_time\_met, days\_met$\rightarrow$(everything else) \\
+\hspace*{0.5in}semester, professor, start\_time\_met, days\_met$\rightarrow$(everything else) \\
+\hspace*{0.5in}semester, professor, end\_time\_met, days\_met$\rightarrow$(everything else) 
+
+
+\subsection{EnrolledClass}
+\hspace*{0.5in}student,class\_enrolled $\rightarrow$grade
+
+
+\subsection{Schedule}
+\hspace*{0.5in}user,semester$\rightarrow$schedule\_id 
+
+
+\subsection{Schedule\_class\_enrolled}
+\hspace*{0.5in}schedule\_id,class$\rightarrow$student \\
+\hspace*{0.5in}class,student$\rightarrow$schedule\_id 
+
+For each of these functional dependencies X$\rightarrow$A, X is a candidate
+key. Therefore, the document is in BCNF.
+\section{Revising the Schema}
+After implementing the program, we added the Schedule table. As mentioned
+before, this table is defined as 
+\begin{quote}
+Schedule(\underline{user: varchar(30) (ForeignKey to User),} \\
+\underline{semester: varchar (ForeignKey to Semester),}\\
+\underline{class\_enrolled: Integer(ForeignKey to Class)})
+\end{quote}
+
+This schedule is used to optimize several of our queries. First of all, it
+allows us to quickly find classes by User and Semester. This is used by two of
+the more complicated queries: finding a student's classes by semester (for the
+schedule and for the grades), and for checking for scheduling conflicts when
+the student tries to enroll in another class.
+
+We're also looking at adding the CoursesTaken table. This table allows us to
+check for prereqs with just a single SELECT query. WIthout this table, we'd
+have to join EnrolledClass with Class and then join that with Course.
 \end{document}
 
