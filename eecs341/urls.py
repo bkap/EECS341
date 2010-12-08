@@ -13,5 +13,6 @@ urlpatterns = patterns('',
 
     # Uncomment the next line to enable the admin:
      (r'^admin/', include(admin.site.urls)),
-	 #(r'', 'scheduler.views.lol'),
+	 (r'^$', 'scheduler.views.lol'),
+	 (r'^static/(.*)$','django.views.static.serve',{'document_root': './static/'}),
 )

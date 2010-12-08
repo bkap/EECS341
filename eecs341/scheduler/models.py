@@ -2,7 +2,8 @@ from django.db import models
 from django.contrib.auth.models import User, Group, Permission
 
 # Create your models here.
-
+def must_be_professor(value) :
+	return Group.objects.get(name='Professor') in value.groups.objects.all()
 class Semester(models.Model) :
 	name = models.CharField(max_length=20,primary_key=True)
 	start_date = models.DateField()
@@ -39,7 +40,7 @@ class Class(models.Model) :
 	end_time_met = models.TimeField()
 	max_class_size = models.IntegerField()
 	course = models.ForeignKey(Course)
-	professor = models.ForeignKey(User)
+	professor = models.ForeignKey(User,validators=[must_be_professor])
 	room = models.ForeignKey(Room)
 	def __str__(self) :
 		return "Class: %s at %s, %s" % (self.course, self.start_time_met, self.semester)
