@@ -107,8 +107,34 @@ Join table, to get the list of classes the user is enrolled in for a specific
 semester
 \\
 Room(\underline{buildingName: varchar, roomNumber: Integer}, max\_capacity: Integer)
-Department(\underline{name: varchar(4)})
+Department(\underline{name: varchar(4)}, professor: User(foreign key to user))
+\subsection{Relations} 
+Each entity is related to several others in our model.  This section lists and describes 
+all of the relations as well as their cardinality. 
+\\
+\subsubsection{User has Schedules (1:N)}
+Each user can have a schedule if they are a student.  this relation "has" does not have
+ any attribues. The cardinality is one to many because a stduent(user) can have 1 
+schedule for each semester. student's do not have to have any schedules.  If they have not
+ registered for any classes they will not yet have a schedule.  In this case, we need to 
+ensure that there is a constraint on the database that does not show the schedule of the 
+student if they do not yet have one.  
+\subsubsection{User is a part of Department (1:1)}
+If a user is a teacher (or student?) then they may be a part of the a department.
+ The cardinality of this relation is one to one; each teacher may only belong to 
+one department.
+\subsubsection{user attends/teaches/creates class N:M}
+All users will will be related to teachers based on their type.  Student's enroll and 
+attend classes, Teachers teach classes, and administrators create classes.  Any users 
+of these three types can be associated with multiple classes additionally any class 
+can be assosiciated with multiple users, therefore the cardinality is many to many. 
+Finally this relation has an attribute: grade.  Grades are given to students who 
+finish the class. This attribute is assigned by teacher.
+\subsubsection{Schedule contains Classes (N:M)}
+!!!!WARNING!!! - THIS MIGHT BE WRONG? SHOULD IT BE 1:N?
+\\
+A schedule is a list of classes that a user is enrolled in for a specific semester.  Each schedule can contain multiple classes.  Each class can be in multiple schedules. Therefore, the cardinality is many to many. 
+\subsection{
 
-Department
 \end{document}
 
