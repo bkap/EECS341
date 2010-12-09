@@ -115,7 +115,6 @@ can be assosiciated with multiple users, therefore the cardinality is many to ma
 Finally this relation has an attribute: grade.  Grades are given to students who 
 finish the class. This attribute is assigned by teacher.
 \subsubsection{Schedule contains Classes (N:M)}
-!!!!WARNING!!! - THIS MIGHT BE WRONG? SHOULD IT BE 1:N?
 \\
 A schedule is a list of classes that a user is enrolled in for a specific semester.  Each schedule can contain multiple classes.  Each class can be in multiple schedules. Therefore, the cardinality is many to many. 
 \subsubsection{Class in a Room (N:1)}
@@ -300,5 +299,11 @@ the student tries to enroll in another class.
 We're also looking at adding the CoursesTaken table. This table allows us to
 check for prereqs with just a single SELECT query. WIthout this table, we'd
 have to join EnrolledClass with Class and then join that with Course.
+\section{Revisting the Whole Project}
+A lack of time with other classes made this project somewhat rushed. My group agrees that we would have liked to make the system more verbose.  While the html pages work just fine we would have like to have the time to creat Casscading style sheets and other web formatting to make the web application much prettier.  Additional resources would have made this much easier.  The system as is works for what we intended.  It is somewhat simple but could be expanded with signifigant work into a commonly used application.
+\section{Team Work}
+All team members work effectively and effieciently together. 
+\section{Conclusions}
+Appendicies and diagrams reffered to in this Document are attached. Please contact me if you have any questions with this report.  
 \end{document}
 

@@ -3,18 +3,22 @@
 \usepackage{setspace}
 \usepackage{graphicx}
 \usepackage{amsmath}
-\title{EECS 341 Database Project: Installation Manual. V0.l}
+\title{EECS 341 Database Project: Appendix 2: Installation Manual. V0.2}
 \begin{document}
 \maketitle
-Enclosed is a short maunal explaining the installation of this database system.
-Step 0: Install some type of database(i.e. Postgres or MySQL or SLQlite)
-Step 1: Install python 2.6 or 2.7 
-Step 2: Install Django 1.2 only no other version will work; trust me.  
-Step 3: Install a Web Browser. For it to format properly Internet Explorer 3 or later is a MUST
-Step 4: Configure Djago to work with your database. Fix the settings.py file for your database.
-Step 5: Open the command prompt and navigate to the project directory
-Step 6: Enter the follwing command to sync the database:
-python manage.py syncdb
-Step 7: Enter the follwing command to run the server:
-python manage.py runserver
+\section{Overview}
+This manual Enclosed is a short maunal explaining the installation of this database system. Following these instructions will allow you to use your software for your very own simplified (and much less verbose) student information system.  
+\section{Instalation}
+\subsection{Database Layer}
+In order to use our software you should Install your own databases layer.  Using MySQL, Postgres or SQLlite are all acceptable options. Our software is currently configured for use with a postgres.
+\subsection{Python}
+In order to use Django, the object relational manager, which is the middle layer of the software application.  You must have installed Python version 2.6 or 2.7.
+\subsection{Django}
+Django is the ORM (object relational manager) we used in the database. You must install Django version 1.2 in order to use our software correctly.
+\subsection{Other Requirements}
+A modern webbrowseris required to format some of the html.  So Internet Explorer 4 or later is a must. 
+\section{Configure the Database}
+once you have installed Django and Python. You are ready to set up the Database.  You attach Django to the database by configuring the settings.py file.  if you are using postgres the file will already be confirgured.  Otherwise there are instructions in the file on how to edit it.  The database that you have to attach it to doesn't have to have anything in it.  If you are using sqllite you would only have to set the path to the .db file that contained the tables of your database.  Further instruction on configuring the database may be found on Django's website.  
+\section{Starting the Server}
+Open a commandline.  Once you are in the directory where our project is located. type the line : python manage.py syncdb.  This will sync the database with the fixture that we created. next you run the server by typing: python manage.py runserver
 \end{document}
