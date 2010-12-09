@@ -134,7 +134,7 @@ def set_grades(request) :
 		return HttpResponse("class not found")
 	try :
 		klass = Class.objects.get(id=getattr(request, request.method)['class'])
-	except Class.DoesNotExist as e :
+	except Class.DoesNotExist as: e :
 		return HttpResponse("class not found")
 	if klass is None :
 		return HttpResponse("class not found")
