@@ -215,6 +215,7 @@ RC:
   \wedge EC3.user = user \wedge EC3.class = c3.id \wedge C3.course =
   co.prereq\})\}\}
 \end{align*}
+
 \subsection{Query 3}
 \texttt{SELECT Class.name, Class.dept, Class.number, Class.start\_time\_met,
 Class.end\_time\_met, Class.day\_met FROM Class, Semester WHERE Class.semester
@@ -222,6 +223,14 @@ Class.end\_time\_met, Class.day\_met FROM Class, Semester WHERE Class.semester
 Semester.end\_date > \textbf{today} AND EXISTS (Select * From EnrolledClass
 WHERE EnrolledClass.user = \textbf{user} AND EnrolledClass.class = Class.id)}
 \section{Functional Dependencies and 3NF}
+
+RA:
+\begin{align*}
+\sigma_{class.semester = \textbf{semester} \&
+ \semester.start_date < \textbf{today} \&
+  \EnrolledClass.user = \textbf{user} \&
+   \EnrolledClass.class = class.id}
+\end{align*}
 
 
 \subsection{Semester}
