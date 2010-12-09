@@ -30,6 +30,10 @@
         <td> {{class.start_time_met|time:"H:i"}} - {{class.end_time_met|time:"H:i"}} </td>
  </tr>
  <tr> <td colspan="4"> {{class.course.description}} </td> </tr>
+ {% if is_student %}
+ <tr> <td colspan="4"> <a href="enroll.html?class={{class.id}}"> <img
+ src="/static/enroll.png" /></a> </td> </tr>
+{% endif %}
 </table>
 <br />
 {%endfor%}

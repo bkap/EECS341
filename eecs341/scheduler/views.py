@@ -8,6 +8,7 @@ from scheduler.models import *
 from django.contrib.auth.decorators import permission_required, login_required
 from django.core.files.base import File
 from django.template import Template, Context
+import datetime
 # Create your views here.
 def login_page(request) :
 	if request.method == 'GET' :
@@ -86,8 +87,9 @@ def searchresults(request) :
 			queries['course__number'] = course_num
 		else :
 			queries['course__number__%s' % order] = course_num
+	is_student = Group.objects.get(name="Student") in request.user.groups.all()
 	return render_to_response("search.html",{'user':request.user,
-	'courses':Class.objects.filter(**queries)})
+	'courses':Class.objects.filter(**queries), 'is_student':is_student})
 @permission_required('scheduler.can_enroll',login_url='/scheduler/login.html')
 def getgrades(request) :
 	if request.GET.get('sem',None) != None :
@@ -107,23 +109,23 @@ def enroll_in_class(request) :
 	klass = Class.objects.get(id=request.GET['class'])
 	#now let's see if we are allowed to enroll
 	sem = klass.semester
-	today = datetime.datetime.today()
+	today = datetime.date.today()
 	if sem.reg_start_date > today or sem.reg_end_date < today :
 		return HttpResponse("Sorry, enrollment for this semester has ended")
 	#now let's see if there is enough room in the class
-	students_enrolled = EnrolledCless.objects.filter(class_enrolled=klass)
-	if len(students_enrolled) >= klass.max_capacity :
+	students_enrolled = EnrolledClass.objects.filter(class_enrolled=klass)
+	if len(students_enrolled) >= klass.max_class_size :
 		return HttpResponse("Class add failed- no room in the class")
 	#now check the student's schedule
 	schedule = Schedule.objects.get_or_create(user=request.user, semester=sem)
-	for enrolledKlass in schedule.classes_enrolled.objects.all() :
-		if klass.start_time_met >enrolledKlass.class_enrolled.start_time_met and klass.start_time_met < enrolledKlass.class_enrolled.end_time_met :
+	for enrolledKlass in schedule[0].classes_enrolled.all() :
+		if klass.start_time_met >=enrolledKlass.class_enrolled.start_time_met and klass.start_time_met <= enrolledKlass.class_enrolled.end_time_met or (klass.end_time_met >= enrolledKlass.class_enrolled.start_time_met and klass.end_time_met <= enrolledKlass.class_enrolled.end_time_met) :
 			return HttpResponse("Unable to enroll: You have a conflict with %s"  % klass.course)
 	#alright, looks like we're ok to add.
-	newclass = EnrolledClass(user=request.user, class_enrolled=klass)
+	newclass = EnrolledClass(student=request.user, class_enrolled=klass)
 	newclass.save()
-	schedule.classes_enrolled.append(newclass)
-	schedule.save()
+	schedule[0].classes_enrolled.add(newclass)
+	schedule[0].save()
 	return HttpResponse("Now enrolled in %s" % klass)
 
 
