@@ -10,20 +10,56 @@
 Enclosed is a short maunal for the average user of this application.  
 Thise maunal is broken into three sections based on the three types of 
 users: Students, professors, and administrators.
-\subsection{Administrators}
-Administrators are able to add new users, define new semesters, create new
+\section{Administrators}
+\subsection{Overview}
+Administrators Administrators are able to add new users, define new semesters, create new
 courses and classes, view and set the grades of any student, and enroll students in
-classes.
-\subsection{Professors}
-Professors are capable of being listed as teaching classes. They are able to
-view and set the grades of the students for the classes taught by the
-professor. They are capable of enrolling students in classes that they teach.
-\subsection{Students}
-\subsub
-The primary use of this system for students is to enroll and withdraw in classes.  The system which is simple and intuitive, is viewed through a series of simple html webpages which students can explore to search for and enroll in classes.  For a first time user you simeply go to the login page.  The page will be in the form URLofTheServer/Login.html.  To login you simple fill in your credentials; these will be given to you by your system administrator.  Once you have logged into the system you have the option   
-maximum capacity, and viewing their own grades.
-\subsection{All users}
-All users can search the database of classes. They can see basic information
-about the class as well as viewing who is enrolled in each class.
+classes.  All of this is simple to do from the administrator panel on the server.  
+\subsection{Login}
+The admin is located on the server on URL_of_the_server/admin. The first time you attempt
+to login you will be prompted to create a new administrator.  Follow the instructions that 
+do this.  Once you have logged into the system you may manually add students, professors, 
+other administrators.  You may create Classses, Courses, Enrolled classses, Rooms, 
+Schedules, and Semester.
+\section{Professors}
+\subsection{Login}
+Professors may use this system to view the students which are enrolled 
+in their classes and assign grades.The page will be in the form URL_of_the_Server/Scheduler/Login.html. 
+ To login you simply fill in your credentials and click the login button; these will be 
+given to you by your system administrator.  
+\subsection{View Students}
+Once you have logged into the system you will be redirected to a home page that lists all 
+of the classes that you are scheduled to teach. there is a button by each of these classes
+ which says view student list.  Pressing this button will redirect you to the list of 
+students for this class.
+\subsection{Set Grades}
+Grades may be set seperately using the drop down menus provided.  Clicking submit will save
+ them to the database.  They may be updated later.
+\section{Students}
+\subsection{Login}
+The primary use of this system for students is to enroll and withdraw in classes.  
+The system which is simple and intuitive, is viewed through a series of simple html webpages 
+which students can explore to search for and enroll in classes.  For a first time user you 
+simeply go to the login page.  The page will be in the form URL_of_the_Server/Scheduler/Login.html. 
+ To login you simply fill in your credentials and click the login button; these will be 
+given to you by your system administrator.  
+\subsection{HomePage}
+Once you have logged into the system you will be redirected to a Home Page.  Thise page 
+will list all of the classes that you are currenly enrolled in.  From this page there are 
+multiple options. First you may Search from classes (by clicking on the Search button) 
+second you may view your grades ( by clicking the view grades button).
+\subsection{Search for Classes}
+The Class Search form has a few options that you can use. Onece you have filled out the 
+form you may click the search button alternatively pressing enter will also work. Once
+You have made a search you will be redirected to a page with all of the classes that 
+fit into your schedule.  
+\subsection{Enrolla Class}
+Upon searching for classes using the search function; you will be givin a list of classes which
+fit the criteria you set.  You will be able to select an Enroll button adjacent to these classes
+to enroll in them.  You will be unable to enroll in a class that conflicts with any class you are
+ currently registered for. 
+\subsection{View Grades for a Class}
+From the home page there is a view grades button. Selecting this will bring you to another page
+ which allows you to chose a semester.  Hit the get grades button an classes from that semester
+ that you have been given grades will be visible.
 \end{document}
-
