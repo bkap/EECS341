@@ -52,8 +52,14 @@ Schedule(\underline{user: varchar(30) (ForeignKey to User), semester: varchar(Fo
 CoursesTaken(\underline{student: varchar(30) (ForeignKey to User), courseID: Integer}) \\
 Room(\underline{buildingName: varchar, roomNumber: Integer}, max\_capacity:
 Integer)
+\subsection{Queries and Transactions}
+Admins need to be able to add users and classes. Students need to be able to
+view their schedules (query Schedule based on user and semester), enroll in classes (Create EnrolledClass and Schedule
+objects). They also need to be able to view their grades. Professors need to be
+able to set their students grades for each class they teach.
 
-		
+Adding users and classes will only occur twice a year, and will probably be
+done in bulk.
 	
 \section{ER data model design}
 List the entities and their attributes. Specify the domain of each attribute. Specify the properties of each attribute (i.e., key, foreign key, composite/simple, single-valued/multi-valued, derived, incomplete with different nulls, roles, weak/strong entity type, etc.). Specify the relationships and their attributes. List the properties of each relationship (i.e., degree of the relationship, cardinality ratios (1-1, 1-N, N-M), participation constraints (total, partial), other application-specific constraints, etc.). Your ER model should have at least 5 entity types, 7 relationship types, and sufficiently many attributes and constraints of different types. Draw the E-R diagram, and incorporate everything discussed in this step into the E-R diagram. 
@@ -180,22 +186,24 @@ OR (C2.start\_time $>$ Class.start\_time and C2.start\_time $<$
 Class.end\_time)) AND EXISTS (SELECT * FROM Course where Course.id =
 Class.course AND (Course.prereq = NULL OR EXISTS (SELECT * From EnrolledClass
 ec3, Class c3 WHERE ec3.user = user and ec3.class = c3.id AND c3.course =
-Course.prereq)))}
+Course.prereq)))} 
 
 RA:
-\begin{align*}
-\sigma_{class.id=\textbf{class}}(Class) \bowtie \\
- \sigma_{reg\_start\_date  < \textbf{today} \wedge reg\_end\_date >
- \textbf{today}}(Semester) - \\
- (Class \bowtie \pi_{class}(\sigma_{\,_{class}G_{Count(*)} >
-maxcapacity}(EnrolledClass) \cup \sigma_{\textbf{class}.days\_met = days\_met
-\wedge \\
+\begin{align*} 
+&\sigma_{class.id=\textbf{class}}(Class) \bowtie \\
+& \sigma_{reg\_start\_date  < \textbf{today} \wedge reg\_end\_date >
+\textbf{today}}(Semester) - \\
+&(Class \bowtie \pi_{class}(\sigma_{\,_{class}G_{Count(*)} >
+maxcapacity}(EnrolledClass) \cup \\
+&\sigma_{\textbf{class}.days\_met = days\_met} \\
+&\sigma_{ 
 (start\_time < \textbf{class}.start\_time \wedge end\_time >
-\textbf{class}.start\_time)\\
-\vee (start\_time > \textbf{class}.start\_time \\
-\wedge start\_time > \textbf{class}.end\_time)}( (Class \bowtie \sigma_{ec.user
-= \textbf{user}\vee \\
-ec.semester=\textbf{semester}}(EnrolledClass))))) 
+\textbf{class}.start\_time)
+\vee (start\_time > \textbf{class}.start\_time 
+\wedge start\_time > \textbf{class}.end\_time)} \\
+&(Class \bowtie \\
+&\sigma_{ec.user = \textbf{user}\vee 
+ec.semester=\textbf{semester}}(EnrolledClass)))) 
 \end{align*}
 
 RC:
@@ -219,23 +227,28 @@ RC:
 \subsection{Query 3}
 \texttt{SELECT Class.name, Class.dept, Class.number, Class.start\_time\_met,
 Class.end\_time\_met, Class.day\_met FROM Class, Semester WHERE Class.semester
-= Semester.name AND Semester.start\_date < \textbf{today} and
-Semester.end\_date > \textbf{today} AND EXISTS (Select * From EnrolledClass
+= Semester.name AND Semester.start\_date $<$ \textbf{today} and
+Semester.end\_date $>$ \textbf{today} AND EXISTS (Select * From EnrolledClass
 WHERE EnrolledClass.user = \textbf{user} AND EnrolledClass.class = Class.id)}
-\section{Functional Dependencies and 3NF}
+
 
 RA:
 \begin{align*}
-\sigma_{class.semester = \textbf{semester} \&
- \semester.start_date < \textbf{today} \&
-  \EnrolledClass.user = \textbf{user} \&
-   \EnrolledClass.class = class.id}
+\sigma_{user = \textbf{user}}(EnrolledClass) \bowtie \\
+\sigma_{class.semester = \textbf{semester}} Class \bowtie \\
+\sigma_{semester.start\_date < \textbf{today}} \wedge semester.end\_date > \\
+\textbf{today}(Semester) \end{align*}
+
+RC:
+\begin{align*}
+\{t | & \exists C,S | \{Class(C) \wedge Semester(S) \wedge C.semester = S \\
+& \wedge Semester.start_date < \textbf{today} \wedge Semester.end_date > \\
+& \textbf{today} \wedge \exists E | \{EnrolledClass E \wedge E.user = \\
+&  \textbf{user} \wedge E.class_enrolled = C.id\}\}\}
 \end{align*}
-
-
 \subsection{Semester}
 \hspace{0.5in}name$\rightarrow$ start\_date, end\_date, reg\_start\_date, reg\_end\_date  
-
+\section{Functional Dependencies and 3NF}
 
 \subsection{Room}
 \hspace*{0.5in}buildingname, roomnum $\rightarrow$ max\_capacity
