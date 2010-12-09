@@ -6,6 +6,7 @@
 \title{EECS 341 Database Project: Class Scheduler}
 \begin{document}
 \maketitle
+\tableofcontents
 \section{Introduction}
 This project is a course scheduling program for students at a University
 (similar to the Student Information System that Case uses, but one that doesn't
@@ -166,16 +167,41 @@ c2.dept = dept \wedge c2.number < number))\}\end{align*}
 \subsection{Query 2}
 (For this query, class, user, and today are parameters of the query chosen by
 the user) \\
-SELECT * FROM Class WHERE Class.id = class AND EXISTS (SELECT * FROM Semester WHERE Semester.name = Class.semester AND Semester.reg\_start\_date $<$ today AND Semester.reg\_end\_date $>$ today) AND NOT EXISTS (SELECT * FROM EnrolledClass WHERE EnrolledClass.class = class.id GROUP BY EnrolledClass.class HAVING Count(*) $>$ Class.max\_capacity) AND NOT EXISTS (SELECT * FROM EnrolledClass EC2,Class C2 WHERE EC2.user = user AND C2.id = EC2.class AND C2.semester = Semester.name AND C2.days\_met = Class.days\_met AND (C2.start\_time $<$ Class.start\_time AND C2.end\_time $>$ Class.start\_time) OR (C2.start\_time $>$ Class.start\_time and C2.start\_time $<$ Class.end\_time)) AND EXISTS (SELECT * FROM Course where Course.id = Class.course AND (Course.prereq = NULL OR EXISTS (SELECT * From EnrolledClass ec3, Class c3 WHERE ec3.user = user and ec3.class = c3.id AND c3.course = Course.prereq)))
+
+\texttt{SELECT * FROM Class WHERE Class.id = class AND EXISTS (SELECT * FROM
+Semester WHERE Semester.name = Class.semester AND Semester.reg\_start\_date $<$
+today AND Semester.reg\_end\_date $>$ today) AND NOT EXISTS (SELECT * FROM
+EnrolledClass WHERE EnrolledClass.class = class.id GROUP BY EnrolledClass.class
+HAVING Count(*) $>$ Class.max\_capacity) AND NOT EXISTS (SELECT * FROM
+EnrolledClass EC2,Class C2 WHERE EC2.user = user AND C2.id = EC2.class AND
+C2.semester = Semester.name AND C2.days\_met = Class.days\_met AND
+(C2.start\_time $<$ Class.start\_time AND C2.end\_time $>$ Class.start\_time)
+OR (C2.start\_time $>$ Class.start\_time and C2.start\_time $<$
+Class.end\_time)) AND EXISTS (SELECT * FROM Course where Course.id =
+Class.course AND (Course.prereq = NULL OR EXISTS (SELECT * From EnrolledClass
+ec3, Class c3 WHERE ec3.user = user and ec3.class = c3.id AND c3.course =
+Course.prereq)))}
 
 RA:
-
+\begin{align*}
+\sigma_{class.id=\textbf{class}}(Class) \bowtie \\
+ \sigma_{reg\_start\_date  < \textbf{today} \wedge reg\_end\_date >
+ \textbf{today}}(Semester) - \\
+ (Class \bowtie \pi_{class}(\sigma_{\,_{class}G_{Count(*)} >
+maxcapacity}(EnrolledClass) \cup \sigma_{\textbf{class}.days\_met = days\_met
+\wedge \\
+(start\_time < \textbf{class}.start\_time \wedge end\_time >
+\textbf{class}.start\_time)\\
+\vee (start\_time > \textbf{class}.start\_time \\
+\wedge start\_time > \textbf{class}.end\_time)}( (Class \bowtie \sigma_{ec.user
+= \textbf{user}\vee \\
+ec.semester=\textbf{semester}}(EnrolledClass))))) 
+\end{align*}
 
 RC:
 \begin{align*} \{ t | & \exists C, Co | \{Class(C) \wedge C.id = t.id
   \wedge \\
- &  Course(Co)  \wedge Co.id = C.course \wedge
-    \\
+ &  Course(Co)  \wedge Co.id = C.course \wedge \\
  &  \exists S | \{Semester(S) \wedge S.name = C.semester \wedge \\
 &   S.reg\_start\_date < today \wedge S.reg\_end\_date > today\} \wedge \\
  &  \neg \exists EC2, C2 | \{EnrolledClass(EC2) \wedge Class(C2) \wedge\\
